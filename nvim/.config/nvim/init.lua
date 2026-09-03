@@ -16,6 +16,7 @@ o.cursorline = false
 o.signcolumn = "yes"
 o.termguicolors = true
 o.showmode = false
+o.laststatus = 3
 
 -- layout
 o.wrap = true
@@ -55,7 +56,7 @@ o.shellcmdflag = "-ic"
 
 -- split
 o.fillchars = {
-  horiz = '╍',
+  horiz = '╌',
   horizup = '┴',
   horizdown = '┬',
   vert = '╎',
@@ -99,7 +100,7 @@ map('n', '<C-t>', function()
 
   if #term_wins == 0 then
     vim.cmd('rightbelow vsplit | terminal')
-    vim.cmd('vertical resize 30')
+    vim.cmd('vertical resize 50')
   elseif #term_wins == 1 then
     vim.api.nvim_set_current_win(term_wins[1])
     vim.cmd('rightbelow split | terminal')
@@ -140,7 +141,6 @@ vim.pack.add({
     version = vim.version.range("^1") },
   sources["github"] .. "nvim-telescope/telescope.nvim",
   sources["github"] .. "rachartier/tiny-inline-diagnostic.nvim",
-
 })
 
 -- configs / setups
@@ -241,4 +241,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#9D7CD8" })
 
 -- [imports] ------------------------------------------------------------------
--- require("statusline").setup()
+require("statusline").setup({
+    options = {
+        globalstatus = true
+    }
+})
