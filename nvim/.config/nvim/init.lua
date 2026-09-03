@@ -1,7 +1,8 @@
 -- TODO: (dont forget to add ts)
--- yank highlighting
--- saving cursor place and going back to it after reopening file
-
+    -- Diagnostics overview window
+    -- Diagnostics motion keys
+    -- Statuline
+    -- Snippets
 -- [options] ------------------------------------------------------------------
 local o = vim.opt
 
@@ -51,8 +52,21 @@ o.swapfile = false
 
 -- shell
 o.shellcmdflag = "-ic"
--- keybinds
 
+-- split
+o.fillchars = {
+  horiz = '╍',
+  horizup = '┴',
+  horizdown = '┬',
+  vert = '╎',
+  vertleft = '┤',
+  vertright = '├',
+  verthoriz = '┼',
+}
+
+vim.api.nvim_set_hl(0, "DimmedBackground", { bg = "#0A0A0A" })
+
+vim.opt.winhighlight = "Normal:Normal,NormalNC:DimmedBackground"
 
 -- [keymaps] ------------------------------------------------------------------
 vim.g.mapleader = " "
@@ -66,11 +80,37 @@ map('n', '<C-s>', ':w<CR>', opts)
 map('n', '<C-c>', ':q<CR>', opts)
 map('n', '<C-w>', ':wq<CR>', opts)
 
--- window split nav
+-- window split
 map('n', '<C-h>', '<C-w>h', opts)
 map('n', '<C-j>', '<C-w>j', opts)
 map('n', '<C-k>', '<C-w>k', opts)
 map('n', '<C-l>', '<C-w>l', opts)
+
+map('t', '<Esc>', [[<C-\><C-n>]], { desc = 'Escape Terminal Mode'})
+
+map('n', '<C-t>', function()
+  local term_wins = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].buftype == 'terminal' then
+      table.insert(term_wins, win)
+    end
+  end
+
+  if #term_wins == 0 then
+    vim.cmd('rightbelow vsplit | terminal')
+    vim.cmd('vertical resize 30')
+  elseif #term_wins == 1 then
+    vim.api.nvim_set_current_win(term_wins[1])
+    vim.cmd('rightbelow split | terminal')
+  else
+    for _, win in ipairs(term_wins) do
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+  end
+end)
 
 -- telescope
 local builtin = require("telescope.builtin")
@@ -178,6 +218,27 @@ for server, config in pairs(servers) do
     vim.lsp.config(server, config)
     vim.lsp.enable(server)
 end
+
+-- [custom setups] ------------------------------------------------------------------
+vim.api.nvim_create_autocmd("TextYankPost", {
+    callback = function()
+        vim.highlight.on_yank()
+    end
+})
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+    desc = "jump to last pos when opening a file",
+	callback = function(args)
+		local valid_line = vim.fn.line([['"]]) >= 1 and vim.fn.line([['"]]) < vim.fn.line("$")
+		local not_commit = vim.b[args.buf].filetype ~= "commit"
+
+		if valid_line and not_commit then
+			vim.cmd([[normal! g`"]])
+		end
+	end
+})
+
+vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#9D7CD8" })
 
 -- [imports] ------------------------------------------------------------------
 -- require("statusline").setup()
