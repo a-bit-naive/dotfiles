@@ -122,6 +122,7 @@ map('n', '<leader>fe', builtin.current_buffer_fuzzy_find, opts)
 map('n', 'gd', builtin.lsp_definitions, opts)
 map('n', 'gr', builtin.lsp_references, opts)
 map('n', 'gi', builtin.lsp_implementations, opts)
+map('n', '<leader>ca', vim.lsp.buf.code_action, opts);
 
 -- oil
 map('n', '-', '<cmd>Oil --float .<cr>')
