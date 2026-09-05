@@ -20,3 +20,9 @@ abbr -a gcm --set-cursor 'git commit -m "%"'
 abbr -a gp "git push"
 abbr -a "git log --oneline --graph"
 abbr -a gr "git revert"
+
+# tmux
+abbr -a txs "tmux ls"
+abbr -a txa "tmux attach -t "
+abbr -a txn "tmux new -s "
+abbr -a txr "tmux -kill session "

@@ -242,8 +242,4 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#9D7CD8" })
 
 -- [imports] ------------------------------------------------------------------
-require("statusline").setup({
-    options = {
-        globalstatus = true
-    }
-})
+require("statusline").setup()
