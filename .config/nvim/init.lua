@@ -113,7 +113,21 @@ map('n', '<C-t>', function()
   end
 end)
 
--- telescope
+-- [plugins] ------------------------------------------------------------------
+local sources = { github = "https://github.com/", codeberg = "https://codeberg.org/", }
+
+vim.pack.add({
+  sources["github"] .. "savq/paq-nvim",
+  sources["github"] .. "nvim-mini/mini.pairs",
+  sources["github"] .. "stevearc/oil.nvim",
+  sources["github"] .. "nvim-treesitter/nvim-treesitter",
+  sources["github"] .. "nvim-mini/mini.completion",
+  sources["github"] .. "nvim-telescope/telescope.nvim",
+  sources["github"] .. "rachartier/tiny-inline-diagnostic.nvim",
+})
+
+
+-- configs / setups
 local builtin = require("telescope.builtin")
 map('n', '<leader>ff', builtin.find_files, opts)
 map('n', '<leader>fw', builtin.live_grep, opts)
@@ -124,27 +138,6 @@ map('n', 'gr', builtin.lsp_references, opts)
 map('n', 'gi', builtin.lsp_implementations, opts)
 map('n', '<leader>ca', vim.lsp.buf.code_action, opts);
 
--- oil
-map('n', '-', '<cmd>Oil --float .<cr>')
-
--- diagnostics
-map('n', '<leader>dt', '<cmd>TinyInlineDiag toggle<cr>', { desc = "Toggle diagnostics" })
-
--- [plugins] ------------------------------------------------------------------
-local sources = { github = "https://github.com/", codeberg = "https://codeberg.org/", }
-
-vim.pack.add({
-  sources["github"] .. "savq/paq-nvim",
-  sources["github"] .. "nvim-mini/mini.pairs",
-  sources["github"] .. "stevearc/oil.nvim",
-  sources["github"] .. "nvim-treesitter/nvim-treesitter",
-  { src = sources["github"] .. "saghen/blink.cmp",
-    version = vim.version.range("^1") },
-  sources["github"] .. "nvim-telescope/telescope.nvim",
-  sources["github"] .. "rachartier/tiny-inline-diagnostic.nvim",
-})
-
--- configs / setups
 require("oil").setup({
     default_file_explorer = true,
     columns = {
@@ -155,7 +148,8 @@ require("oil").setup({
     watch_for_changes = true, -- reload oil when fs changes
     show_hidden = false, -- toggle with <C-h>
     keymaps = {
-        ["<C-h>"] = { "actions.toggle_hidden", mode = 'n' },
+        ["<C-h>"] = { "actions.toggle_hidden", mode = "n" },
+        ["-"] = { "<cmd>Oil --float .<cr>", mode = "n" },
     },
     constraint_cursor = "editable",
     float = {
@@ -169,15 +163,16 @@ require("oil").setup({
     natural_order = "fast",
 })
 
-
-require("blink.cmp").setup({
-    keymap = { preset = "default" },
-    appearance = {
-        nerd_font_variant = "mono"
-    },
-    fuzzy = {
-        implementation = "prefer_rust"
-    }
+require("mini.completion").setup({
+  delay = { completion = 1, info = 100, signature = 50 },
+  window = {
+    info = { height = 25, width = 80, border = nil },
+    signature = { height = 25, width = 80, border = nil },
+  },
+  mappings = {
+    scroll_down = '<C-n>',
+    scroll_up = '<C-p>',
+  },
 })
 
 require("mini.pairs").setup({})
@@ -194,11 +189,18 @@ require("tiny-inline-diagnostic").setup({
 	    	softwrap = 20,
         },
     },
+    keymaps = {
+        ["<leader>dt"] = { "<cmd>TinyInlineDiag toggle<cr>", mode = "n"  },
+    },
 })
 
 -- lsp
 local servers = {
     lua_ls = {
+        cmd = { "lua-language-server" },
+        filetypes = {
+            "lua"
+        },
         settings = {
             Lua = {
                 diagnostics = {
@@ -210,11 +212,21 @@ local servers = {
     omnisharp = {},
     pylsp = {},
     denols = {},
-    clangd = {},
-    gopls = {},
+    clangd = {
+        cmd = { "clangd" },
+        filetypes = {
+            "c","cpp", "h",
+        },
+    },
+    gopls = {
+        cmd = { "gopls" },
+        filetypes = {
+            "go"
+        },
+    },
 }
 
-vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
+vim.lsp.config("*", { capabilities = require("mini.completion").get_lsp_capabilities() })
 for server, config in pairs(servers) do
     vim.lsp.config(server, config)
     vim.lsp.enable(server)
