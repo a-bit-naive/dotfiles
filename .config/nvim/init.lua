@@ -137,6 +137,7 @@ map('n', 'gd', builtin.lsp_definitions, opts)
 map('n', 'gr', builtin.lsp_references, opts)
 map('n', 'gi', builtin.lsp_implementations, opts)
 map('n', '<leader>ca', vim.lsp.buf.code_action, opts);
+map('n', '-', "<cmd>Oil --float<cr>", opts);
 
 require("oil").setup({
     default_file_explorer = true,
@@ -149,7 +150,6 @@ require("oil").setup({
     show_hidden = false, -- toggle with <C-h>
     keymaps = {
         ["<C-h>"] = { "actions.toggle_hidden", mode = "n" },
-        ["-"] = { "<cmd>Oil --float .<cr>", mode = "n" },
     },
     constraint_cursor = "editable",
     float = {
