@@ -122,6 +122,7 @@ vim.pack.add({
   sources["github"] .. "stevearc/oil.nvim",
   sources["github"] .. "nvim-treesitter/nvim-treesitter",
   sources["github"] .. "nvim-mini/mini.completion",
+  sources["github"] .. "nvim-lua/plenary.nvim",
   sources["github"] .. "nvim-telescope/telescope.nvim",
   sources["github"] .. "rachartier/tiny-inline-diagnostic.nvim",
 })
