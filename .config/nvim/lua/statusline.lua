@@ -1,21 +1,17 @@
 local M = {}
 
 local function get_file_icon()
-  local filename = vim.fn.expand("%:t")
-  local extension = vim.fn.expand("%:e")
+    local filename = vim.fn.expand("%:t")
 
-  if vim.icon then
-    local icon = vim.icon.get({ name = filename, extension = extension })
-    if icon then return icon .. " " end
-  end
+    local ok, icons = pcall(require, "mini.icons")
+    if ok then
+        local icon = icons.get("file", filename)
+        if icon then
+            return icon .. " "
+        end
+    end
 
-  local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-  if has_devicons then
-    local icon = devicons.get_icon(filename, extension, { default = true })
-    if icon then return icon .. " " end
-  end
-
-  return "󰈔 "
+    return "󰈔 " -- fallback
 end
 
 local function get_lsp_clients()

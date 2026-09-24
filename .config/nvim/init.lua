@@ -81,6 +81,12 @@ map('n', '<C-s>', ':w<CR>', opts)
 map('n', '<C-c>', ':q<CR>', opts)
 map('n', '<C-w>', ':wq<CR>', opts)
 
+-- navigation
+map('n', '<C-i>', '<C-d>', opts)
+
+-- Completion
+map('i', '<C-Tab>', '<C-k>', opts)
+
 -- window split
 map('n', '<C-h>', '<C-w>h', opts)
 map('n', '<C-j>', '<C-w>j', opts)
@@ -122,11 +128,12 @@ vim.pack.add({
   sources["github"] .. "stevearc/oil.nvim",
   sources["github"] .. "nvim-treesitter/nvim-treesitter",
   sources["github"] .. "nvim-mini/mini.completion",
+  sources["github"] .. "nvim-mini/mini.icons",
+  sources["github"] .. "nvim-mini/mini.snippets",
   sources["github"] .. "nvim-lua/plenary.nvim",
   sources["github"] .. "nvim-telescope/telescope.nvim",
   sources["github"] .. "rachartier/tiny-inline-diagnostic.nvim",
 })
-
 
 -- configs / setups
 local builtin = require("telescope.builtin")
@@ -164,17 +171,31 @@ require("oil").setup({
     natural_order = "fast",
 })
 
+require("mini.icons").setup({
+    -- I NEED GO GOPHER
+    extension = {
+        go = { glyph = "" }
+    },
+
+    lsp = {
+        function_ = { glyph = "󰊕"},
+        method = { glyph = "" },
+        variable = { glyph = "󰫧" },
+        class = { glyph = "" },
+    }
+})
+o.pumheight = 10 --Completion options
+MiniIcons.tweak_lsp_kind("replace")
+
 require("mini.completion").setup({
   delay = { completion = 1, info = 100, signature = 50 },
   window = {
-    info = { height = 25, width = 80, border = nil },
-    signature = { height = 25, width = 80, border = nil },
-  },
-  mappings = {
-    scroll_down = '<C-n>',
-    scroll_up = '<C-p>',
+    info = { height = 20, width = 80, border = nil },
+    signature = { height = 20, width = 80, border = nil },
   },
 })
+
+
 
 require("mini.pairs").setup({})
 require("tiny-inline-diagnostic").setup({
@@ -205,14 +226,24 @@ local servers = {
         settings = {
             Lua = {
                 diagnostics = {
-                    globals = { "vim" },
+                    globals = { "vim", "MiniIcons" },
             	},
 	       },
 	    },
     },
     omnisharp = {},
-    pylsp = {},
-    denols = {},
+    pylsp = {
+        cmd = { "pylsp" }, filetypes = {
+            "python"
+        }
+    },
+    denols = {
+        cmd = { "deno" },
+        filetypes = {
+            "html", "css", "js",
+            "ts", "mjs", "jsx", "tsx"
+        }
+    },
     clangd = {
         cmd = { "clangd" },
         filetypes = {
